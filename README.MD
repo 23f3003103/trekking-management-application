@@ -1,0 +1,1 @@
+The Trekking Management Application is a simple and efficient platform for managing trekking activities. It helps organizers handle trek planning, participant registrations, guide assignments, and trip tracking from a single system.
