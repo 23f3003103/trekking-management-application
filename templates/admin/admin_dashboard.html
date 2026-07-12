@@ -34,51 +34,43 @@
         <ul class="nav-bar flex-column">
 
             <li class="nav-item">
-                <a href="/templates/admin/admin_dashboard.html" class="nav-link active">
+                <a href="{{ url_for('auth.admin') }}" class="nav-link active">
                     <i class="bi bi-grid-fill"></i>
                     Dashboard
                 </a>
             </li>
 
             <li class="nav-item">
-                <a href="/templates/admin/admin_manage_trek.html" class="nav-link">
+                <a href="{{ url_for('auth.admin_trek') }}" class="nav-link">
                     <i class="bi bi-map"></i>
                     Treks
                 </a>
             </li>
 
             <li class="nav-item">
-                <a href="/templates/admin/admin_manage_staff.html" class="nav-link">
+                <a href="{{ url_for('auth.admin_manage_staff') }}" class="nav-link">
                     <i class="bi bi-people"></i>
                     Manage Staff
                 </a>
             </li>
 
             <li class="nav-item">
-                <a href="/templates/admin/admin_manage_users.html" class="nav-link">
+                <a href="{{ url_for('auth.admin_manage_trekker') }}" class="nav-link">
                     <i class="bi bi-people"></i>
-                    Manage Users
+                    Manage Trekker
                 </a>
             </li>
 
             <li class="nav-item">
-                <a href="/templates/admin/admin_bookings.html" class="nav-link">
+                <a href="{{ url_for('auth.admin_manage_booking') }}" class="nav-link">
                     <i class="bi bi-calendar-check"></i>
                     Bookings
                 </a>
             </li>
-
-            <!-- <li class="nav-item">
-                <a href="#" class="nav-link">
-                    <i class="bi bi-gear"></i>
-                    Settings
-                </a>
-            </li> -->
-
         </ul>
 
         <div class="logout">
-            <a href="#" class="nav-link">
+            <a href="/" class="nav-link">
                 <i class="bi bi-box-arrow-right"></i>
                 Logout
             </a>
@@ -109,7 +101,7 @@
                         <li><a class="dropdown-item" href="#"><i class="bi bi-person me-2"></i>Profile</a></li>
                         <li><a class="dropdown-item" href="#"><i class="bi bi-gear me-2"></i>Settings</a></li>
                         <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item text-danger" href="index.html"><i class="bi bi-box-arrow-left me-2"></i>Logout</a></li>
+                        <li><a class="dropdown-item text-danger" href="/"><i class="bi bi-box-arrow-left me-2"></i>Logout</a></li>
                     </ul>
                 </div>
             </div>
@@ -130,7 +122,7 @@
                     <div class="stat-card">
                         <div>
                             <span class="text-muted medium fw-medium d-block mb-1">Total Bookings</span>
-                            <h3 class="fw-bold display-font mb-0">148</h3>
+                            <h3 class="fw-bold display-font mb-0">{{ total_booking }}</h3>
                         </div>
                         <div class="stat-card-icon">
                             <i class="bi bi-calendar-check-fill"></i>
@@ -142,7 +134,7 @@
                     <div class="stat-card blue">
                         <div>
                             <span class="text-muted medium fw-medium d-block mb-1">Total Treks</span>
-                            <h3 class="fw-bold display-font mb-0">24</h3>
+                            <h3 class="fw-bold display-font mb-0"> {{ total_trek }} </h3>
                         </div>
                         <div class="stat-card-icon">
                             <i class="bi bi-compass-fill"></i>
@@ -153,8 +145,8 @@
                 <div class="col-xl-3 col-sm-6">
                     <div class="stat-card amber">
                         <div>
-                            <span class="text-muted medium fw-medium d-block mb-1">Total Users</span>
-                            <h3 class="fw-bold display-font mb-0">18</h3>
+                            <span class="text-muted medium fw-medium d-block mb-1">Total Trekker</span>
+                            <h3 class="fw-bold display-font mb-0">{{ total_trekker }}</h3>
                         </div>
                         <div class="stat-card-icon">
                             <i class="bi bi-people-fill"></i>
@@ -166,7 +158,7 @@
                     <div class="stat-card red">
                         <div>
                             <span class="text-muted medium fw-medium d-block mb-1">Total Staff</span>
-                            <h3 class="fw-bold display-font mb-0">5</h3>
+                            <h3 class="fw-bold display-font mb-0">{{ total_staff }}</h3>
                         </div>
                         <div class="stat-card-icon">
                             <i class="bi bi-person-fill"></i>
@@ -181,7 +173,7 @@
                 <thead class="table-light">
                     <tr>
                     <th scope="col">Booking ID</th>
-                    <th scope="col">User's Name</th>
+                    <th scope="col">Trekker's Name</th>
                     <th scope="col">Trek/Route</th>
                     <th scope="col">Booking Date</th>
                     <th scope="col">Status</th>
@@ -189,45 +181,21 @@
                     </tr>
                 </thead>
                 <tbody>
+                    {% for booking in bookings %}
                     <tr>
-                        <th scope="row">01</th>
-                        <td>Ankush</td>
-                        <td>Vally of Flowers</td>
-                        <td>4 July 2026</td>
-                        <td>Approved</td>
+                        <th scope="row">{{booking.id}}</th>
+                        <td>{{ booking.user.fullname }}</td>
+                        <td>{{ booking.trek.name }}</td>
+                        <td>{{ booking.booking_date | date }}</td>
+                        <td>{{ booking.status }}</td>
                         <td>
-                            <a href="#" class="btn btn-outline-success">
+                            <a href="{{ url_for('auth.admin_approve_booking', id=booking.id) }}" class="btn btn-outline-success">
                                 approve</a>
-                            <a href="#" class="btn btn-outline-danger">
+                            <a href="{{ url_for('auth.admin_reject_booking', id=booking.id) }}" class="btn btn-outline-danger">
                                 reject</a>
                         </td>
                     </tr>
-                    <tr>
-                        <th scope="row">02</th>
-                        <td>Neeraj</td>
-                        <td>Kedarkantha Trek</td>
-                        <td>4 July 2026</td>
-                        <td>Approved</td>
-                        <td>
-                            <a href="#" class="btn btn-outline-success">
-                                approve</a>
-                            <a href="#" class="btn btn-outline-danger">
-                                reject</a>
-                        </td>
-                    </tr>
-                    <tr>
-                        <th scope="row">03</th>
-                        <td>Purnesh</td>
-                        <td>Kedartal Trek</td>
-                        <td>4 July 2026</td>
-                        <td>Approved</td>
-                        <td>
-                            <a href="#" class="btn btn-outline-success">
-                                approve</a>
-                            <a href="#" class="btn btn-outline-danger">
-                                reject</a>
-                        </td>
-                    </tr>
+                    {% endfor %}
                 </tbody>
             </table>
         </div>

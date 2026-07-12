@@ -34,35 +34,35 @@
         <ul class="nav-bar flex-column">
 
             <li class="nav-item">
-                <a href="/templates/admin/admin_dashboard.html" class="nav-link">
+                <a href="{{ url_for('auth.admin') }}" class="nav-link">
                     <i class="bi bi-grid-fill"></i>
                     Dashboard
                 </a>
             </li>
 
             <li class="nav-item">
-                <a href="/templates/admin/admin_manage_trek.html" class="nav-link">
+                <a href="{{ url_for('auth.admin_trek') }}" class="nav-link">
                     <i class="bi bi-map"></i>
                     Treks
                 </a>
             </li>
 
             <li class="nav-item">
-                <a href="/templates/admin/admin_manage_staff.html" class="nav-link">
+                <a href="{{ url_for('auth.admin_manage_staff') }}" class="nav-link">
                     <i class="bi bi-people"></i>
                     Manage Staff
                 </a>
             </li>
 
             <li class="nav-item">
-                <a href="/templates/admin/admin_manage_users.html" class="nav-link active">
+                <a href="{{ url_for('auth.admin_manage_trekker') }}" class="nav-link active">
                     <i class="bi bi-people"></i>
-                    Manage Users
+                    Manage Trekker
                 </a>
             </li>
 
             <li class="nav-item">
-                <a href="/templates/admin/admin_bookings.html" class="nav-link">
+                <a href="{{ url_for('auth.admin_manage_booking') }}" class="nav-link">
                     <i class="bi bi-calendar-check"></i>
                     Bookings
                 </a>
@@ -135,45 +135,25 @@
                         <th scope="col">User ID</th>
                         <th scope="col">User Name</th>
                         <th scope="col">Email</th>
-                        <th scope="col">Contact</th>
                         <th scope="col">Trek Name</th>
                         <th scope="col">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
+                        {% for trekker in trekkers %}
                         <tr>
-                            <th scope="row">U001</th>
-                            <td>Ankush</td>
-                            <td>ankush@gmail.com</td>
-                            <td>8174987932</td>
-                            <td>Kedartal</td>
+                            <th scope="row">{{ trekker.id }}</th>
+                            <td>{{ trekker.user.fullname }}</td>
+                            <td>{{ trekker.user.email }}</td>
+                            <td>{% for booking in trekker.bookings %}
+                                    {{ booking.trek.trekname }}<br>
+                                {% endfor %}
                             <td>
-                                <a href="#" class="btn btn-outline-danger">
+                                <a href="{{ url_for('auth.admin_manage_trekker' , id=trekker.id) }}" class="btn btn-outline-danger">
                                     Blacklist</a>
                             </td>
                         </tr>
-                        <tr>
-                            <th scope="row">U002</th>
-                            <td>Neeraj</td>
-                            <td>neeraj@gmail.com</td>
-                            <td>2534896544</td>
-                            <td>Kedarkantha</td>
-                            <td>
-                                <a href="#" class="btn btn-outline-danger">
-                                    Blacklist</a>
-                            </td>
-                        </tr>
-                        <tr>
-                            <th scope="row">U003</th>
-                            <td>Purnesh</td>
-                            <td>purnesh@gmail.com</td>
-                            <td>9875642315</td>
-                            <td>Vally of Flowers</td>
-                            <td>
-                                <a href="#" class="btn btn-outline-danger">
-                                    Blacklist</a>
-                            </td>
-                        </tr>
+                        {% endfor %}
                     </tbody>
                 </table>
             </div>

@@ -39,37 +39,42 @@
         <ul class="nav-bar flex-column">
 
             <li class="nav-item">
-                <a href="/templates/staff/staff_dashboard.html" class="nav-link">
+                <a href="{{ url_for('auth.staff', staff_id=staff_profile.id) }}" class="nav-link active">
                     <i class="bi bi-grid-fill"></i>
                     Dashboard
                 </a>
             </li>
 
             <li class="nav-item">
-                <a href="/templates/staff/staff_manage_trek.html" class="nav-link active">
+                <a class="nav-link d-flex align-items-center" data-bs-toggle="collapse" href="#myTreksList" role="button" aria-expanded="false" aria-controls="myTreksList">
                     <i class="bi bi-map"></i>
-                    My Treks
+                    <span class="ms-2">My Treks</span>
                 </a>
+                <div class="collapse" id="myTreksList">
+                    <ul class="nav flex-column ms-3">
+                        {% if my_assigned_trek is defined and my_assigned_trek|length > 0 %}
+                            {% for trek in my_assigned_trek %}
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{{ url_for('auth.staff_manage_trek', staff_id=staff_profile.id, trek_id=trek.id) }}">{{ trek.trekname }}</a>
+                                </li>
+                            {% endfor %}
+                        {% else %}
+                            <li class="nav-item"><span class="nav-link text-muted">No assigned treks</span></li>
+                        {% endif %}
+                    </ul>
+                </div>
             </li>
 
             <li class="nav-item">
-                <a href="/templates/staff/staff_profile.html" class="nav-link">
+                <a href="{{ url_for('auth.staff_profile', staff_id=staff_profile.id) }}" class="nav-link">
                     <i class="bi bi-calendar-check"></i>
                     Profile
                 </a>
             </li>
-
-            <!-- <li class="nav-item">
-                <a href="#" class="nav-link">
-                    <i class="bi bi-gear"></i>
-                    Settings
-                </a>
-            </li> -->
-
         </ul>
 
         <div class="logout">
-            <a href="#" class="nav-link">
+            <a href="/" class="nav-link">
                 <i class="bi bi-box-arrow-right"></i>
                 Logout
             </a>
@@ -107,9 +112,10 @@
             <div style="margin-bottom: 30px;">
                 <div class="row align-items-center">
                     <div class="col-md-8">
-                        <h2 class="fw-bold mb-1">Vally of Flowers</h2>
+                        <h2 class="fw-bold mb-1">{{ trek.trekname }}</h2>
                     </div>
                 </div>
+                <form action="{{ url_for('auth.staff_manage_trek', staff_id=staff_profile.id, trek_id=trek.id) }}" method="post">
                 <div class="container py-5">
                 <div class="card-bar p-4 bg-white">
                     <h5 class="fw-bold mb-4" style="font-size: 1.1rem;">Trek Information</h5>
@@ -118,42 +124,42 @@
                         <div class="col-md-6">
                             <div class="row mb-3 align-items-center">
                                 <div class="col-sm-4 info-label">Location</div>
-                                <div class="col-sm-8 info-value">Nepal</div>
+                                <div class="col-sm-8 info-value">{{ trek.location }}</div>
                             </div>
                             
                             <div class="row mb-3 align-items-center">
                                 <div class="col-sm-4 info-label">Duration</div>
-                                <div class="col-sm-8 info-value">12 Days</div>
+                                <div class="col-sm-8 info-value">{{ trek.duration }}</div>
                             </div>
                             
                             <div class="row mb-3 align-items-center">
                                 <div class="col-sm-4 info-label">Start Date</div>
-                                <div class="col-sm-8 info-value">20 May 2036</div>
+                                <div class="col-sm-8 info-value">{{ trek.start_date|date }}</div>
                             </div>
                             
                             <div class="row align-items-center">
                                 <div class="col-sm-4 info-label">End Date</div>
-                                <div class="col-sm-8 info-value">31 May 2036</div>
+                                <div class="col-sm-8 info-value">{{ trek.end_date|date }}</div>
                             </div>
                         </div>
 
                         <div class="col-md-6">
                             <div class="row mb-3 align-items-center">
                                 <div class="col-sm-4 info-label">Total Slots</div>
-                                <div class="col-sm-8 info-value">20</div>
+                                <div class="col-sm-8 info-value">{{ trek.slots }}</div>
                             </div>
                             
                             <div class="row mb-3 align-items-center">
                                 <label for="availableSlots" class="col-sm-4 info-label col-form-label pt-0 pb-0">Available Slots</label>
                                 <div class="col-sm-8">
-                                    <input type="number" class="form-control" id="availableSlots" value="10">
+                                    <input type="number" class="form-control" id="availableSlots" value="10" name="slots">
                                 </div>
                             </div>
                             
                             <div class="row align-items-center">
                                 <label for="statusSelect" class="col-sm-4 info-label col-form-label pt-0 pb-0">Status</label>
                                 <div class="col-sm-8">
-                                    <select class="form-select" id="statusSelect">
+                                    <select class="form-select" id="statusSelect" name="status">
                                         <option value="open" selected>Open</option>
                                         <option value="closed">Closed</option>
                                         <option value="full">Full</option>
@@ -162,11 +168,15 @@
                             </div>
                         </div>
                     </div>
+                    <div class="d-flex justify-content-end mt-4">
+                        <button type="submit" class="btn btn-success px-4">Save Changes</button>
+                    </div>
                 </div>
-            </div>
+                </div>
+                </form>
             </div>
             <div class="col-md-8">
-                <h4 class="fw-bold mb-1">Participants(12)</h4>
+                <h4 class="fw-bold mb-1">Participants</h4>
             </div>
             <div class="main-table">
                 <table class="table text-center table-hover">
@@ -180,27 +190,15 @@
                         </tr>
                     </thead>
                     <tbody>
+                        {% for booking in bookings %}
                         <tr>
-                            <th scope="row">Vally of Flowers</th>
-                            <td>Uttrakhand</td>
-                            <td>12</td>
-                            <td>18</td>
-                            <td>Open</td>
+                            <th scope="row">{{ booking.user.fullname }}</th>
+                            <td>{{ booking.user.email }}</td>
+                            <td>{{ booking.user.fullname }}</td>
+                            <td>{{ booking.booking_date|date }}</td>
+                            <td>{{ booking.status }}</td>
                         </tr>
-                        <tr>
-                            <th scope="row">Kedartal</th>
-                            <td>Uttrakhand</td>
-                            <td>8</td>
-                            <td>12</td>
-                            <td>Open</td>
-                        </tr>
-                        <tr>
-                            <th scope="row">Kedarkantha</th>
-                            <td>Uttrakhand</td>
-                            <td>20</td>
-                            <td>0</td>
-                            <td>Closed</td>
-                        </tr>
+                        {% endfor %}
                     </tbody>
                 </table>
             </div>

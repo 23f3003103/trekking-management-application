@@ -24,6 +24,11 @@
 <body>
     <div class="container">
         <div class="card form-card mx-auto">
+            {% if error %}
+                <div class="alert alert-danger text-center w-100 mx-auto" role="alert" style="max-width: 420px; margin-bottom: 10px; border-radius: 10px;">
+                    {{ error }}
+                </div>
+            {% endif %}
             <div class="card-body p-5">
 
                 <div class="logo">
@@ -35,32 +40,32 @@
                     Register
                 </h4>
 
-                <form>
+                <form action="{{ url_for('auth.register') }}" method="post">
                     <div class="mb-3">
                         <label for="fname" class="form-label">Full Name</label>
-                        <input type="email" id="fname" class="form-control" placeholder="Enter your email">
+                        <input type="text" id="fname" class="form-control" placeholder="Enter your email" name="fullname">
                     </div>
 
                     <div class="mb-3">
                         <label for="email" class="form-label">Email Address</label>
-                        <input type="email" id="email" class="form-control" placeholder="Enter your email">
+                        <input type="email" id="email" class="form-control" placeholder="Enter your email" name="email">
                     </div>
 
                     <div class="mb-3">
                         <label for="pass" class="form-label">Password</label>
-                        <input type="password" id="pass" class="form-control" placeholder="Enter your password">
+                        <input type="password" id="pass" class="form-control" placeholder="Enter your password" name="password">
                     </div>
                     
                     <div class="mb-3">
                         <label for="cpass" class="form-label">Confirm Password</label>
-                        <input type="password" id="cpass" class="form-control" placeholder="Enter your password">
+                        <input type="password" id="cpass" class="form-control" placeholder="Enter your password" name="cpassword">
                     </div>
 
                     <div class="mb-3">
                         <label for="role" class="form-label">You are</label>
                         <select class="form-select" id="role" name="role" required>
-                            <option value="student">Staff</option>
-                            <option value="company">User</option>
+                            <option value="staff">Staff</option>
+                            <option value="trekker">Trekker</option>
                         </select>
                     </div>
 
@@ -74,7 +79,7 @@
 
                 <p class="text-center mb-0">
                     Already have an account?
-                    <a href="login.html" class="fw-semibold text-decoration-none">
+                    <a href="{{ url_for('auth.login') }}" class="fw-semibold text-decoration-none">
                         Login
                     </a>
                 </p>

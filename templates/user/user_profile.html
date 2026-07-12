@@ -131,8 +131,8 @@
                             <div class="d-flex align-items-center gap-4 mb-4 pb-4 border-bottom">
                                 <div class="avatar-placeholder">AM</div>
                                 <div>
-                                    <h4 class="fw-bold mb-1 text-dark">Ankush Maurya</h4>
-                                    <p class="text-muted mb-0">Senior Trek Guide & Expedition Leader</p>
+                                    <h4 class="fw-bold mb-1 text-dark">{{ trekker_profile.user.fullname }}</h4>
+                                    <p class="text-muted mb-0">{{ trekker_profile.about }}</p>
                                 </div>
                             </div>
                             <h5 class="fw-bold mb-4 text-dark" style="font-size: 1.1rem;">Personal Information</h5>
@@ -141,34 +141,34 @@
                                 <div class="col-md-5">
                                     <div class="row mb-3 align-items-baseline">
                                         <div class="col-sm-5 info-label">Full Name</div>
-                                        <div class="col-sm-7 info-value">Ankush Maurya</div>
+                                        <div class="col-sm-7 info-value">{{ trekker_profile.user.fullname }}</div>
                                     </div>
                                     
                                     <div class="row mb-3 align-items-baseline">
                                         <div class="col-sm-5 info-label">Email</div>
-                                        <div class="col-sm-7 info-value text-break">ankush@gmail.com</div>
+                                        <div class="col-sm-7 info-value text-break">{{ trekker_profile.user.email }}</div>
                                     </div>
                                     
                                     <div class="row mb-3 align-items-baseline">
                                         <div class="col-sm-5 info-label">Phone</div>
-                                        <div class="col-sm-7 info-value">+91 84174958623</div>
+                                        <div class="col-sm-7 info-value">{{ trekker_profile.phone }}</div>
                                     </div>
                                 </div>
                                 <div class="col-md-2 d-none d-md-block"></div>
                                 <div class="col-md-5">
                                     <div class="row mb-3 align-items-baseline">
                                         <div class="col-sm-5 info-label">Location</div>
-                                        <div class="col-sm-7 info-value">Uttar Pradesh</div>
+                                        <div class="col-sm-7 info-value">{{ trekker_profile.location }}</div>
                                     </div>
                                     
                                     <div class="row mb-3 align-items-baseline">
                                         <div class="col-sm-5 info-label">Experience</div>
-                                        <div class="col-sm-7 info-value">2+ Years</div>
+                                        <div class="col-sm-7 info-value">{{ trekker_profile.trekking_experience }}</div>
                                     </div>
                                     
                                     <div class="row mb-3 align-items-baseline">
                                         <div class="col-sm-5 info-label">Joined Date</div>
-                                        <div class="col-sm-7 info-value">12 Jan 2024</div>
+                                        <div class="col-sm-7 info-value">{{ trekker_profile.user.joined_date|date }}</div>
                                     </div>
                                 </div>
                             </div>

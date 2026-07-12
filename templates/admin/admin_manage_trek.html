@@ -34,35 +34,35 @@
         <ul class="nav-bar flex-column">
 
             <li class="nav-item">
-                <a href="/templates/admin/admin_dashboard.html" class="nav-link">
+                <a href="{{ url_for('auth.admin') }}" class="nav-link">
                     <i class="bi bi-grid-fill"></i>
                     Dashboard
                 </a>
             </li>
 
             <li class="nav-item">
-                <a href="/templates/admin/admin_manage_trek.html" class="nav-link active">
+                <a href="{{ url_for('auth.admin_trek') }}" class="nav-link active">
                     <i class="bi bi-map"></i>
                     Treks
                 </a>
             </li>
 
             <li class="nav-item">
-                <a href="/templates/admin/admin_manage_staff.html" class="nav-link">
+                <a href="{{ url_for('auth.admin_manage_staff') }}" class="nav-link">
                     <i class="bi bi-people"></i>
                     Manage Staff
                 </a>
             </li>
 
             <li class="nav-item">
-                <a href="/templates/admin/admin_manage_users.html" class="nav-link">
+                <a href="{{ url_for('auth.admin_manage_trekker') }}" class="nav-link">
                     <i class="bi bi-people"></i>
-                    Manage Users
+                    Manage Trekker
                 </a>
             </li>
 
             <li class="nav-item">
-                <a href="/templates/admin/admin_bookings.html" class="nav-link">
+                <a href="{{ url_for('auth.admin_manage_booking') }}" class="nav-link">
                     <i class="bi bi-calendar-check"></i>
                     Bookings
                 </a>
@@ -78,7 +78,7 @@
         </ul>
 
         <div class="logout">
-            <a href="#" class="nav-link">
+            <a href="/" class="nav-link">
                 <i class="bi bi-box-arrow-right"></i>
                 Logout
             </a>
@@ -92,7 +92,7 @@
                 <h1 class="h4 mb-0 fw-bold d-none d-sm-block">TrekManager</h1>
             </div>
             <div class="d-flex align-items-center gap-3">
-                <a href="#">
+                <a href="{{ url_for('auth.admin') }}">
                     <button type="button" class="btn btn-outline-primary">Back</button>
                 </a>
                 <!-- Profile Dropdown -->
@@ -105,7 +105,7 @@
                         <li><a class="dropdown-item" href="#"><i class="bi bi-person me-2"></i>Profile</a></li>
                         <li><a class="dropdown-item" href="#"><i class="bi bi-gear me-2"></i>Settings</a></li>
                         <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item text-danger" href="index.html"><i class="bi bi-box-arrow-left me-2"></i>Logout</a></li>
+                        <li><a class="dropdown-item text-danger" href="/"><i class="bi bi-box-arrow-left me-2"></i>Logout</a></li>
                     </ul>
                 </div>
             </div>
@@ -119,7 +119,7 @@
                         <h2 class="fw-bold mb-1">Treks</h2>
                     </div>
                     <div class="col-md-4 text-md-end mt-3 mt-md-0">
-                        <a href="/templates/admin/admin_add_trek.html" class="btn btn-primary"><i class="bi bi-plus-lg me-2"></i>Add New Trek</a>
+                        <a href="{{ url_for('auth.admin_add_trek') }}" class="btn btn-primary"><i class="bi bi-plus-lg me-2"></i>Add New Trek</a>
                     </div>
                 </div>
             </div>
@@ -184,13 +184,14 @@
                         </tr>
                     </thead>
                     <tbody>
+                        {% for booking in bookings %}
                         <tr>
-                            <th scope="row">01</th>
-                            <td>Vally of Flowers</td>
-                            <td>Uttrakhand</td>
-                            <td>Medium</td>
-                            <td></td>
-                            <td>Approved</td>
+                            <th scope="row">{{ booking.id}}</th>
+                            <td>{{ booking.trek.name }}</td>
+                            <td>{{ booking.trek.location }}</td>
+                            <td>{{ booking.trek.difficulty }}</td>
+                            <td>{{ booking.trek.slot }}</td>
+                            <td>{{ booking.status }}</td>
                             <td>
                                 <div class="d-inline-flex gap-2">
                                     <a href="#" class="btn btn-sm btn-outline-primary" title="Edit"><i class="bi bi-pencil-square"></i></a>
@@ -198,34 +199,7 @@
                                 </div>
                             </td>
                         </tr>
-                        <tr>
-                            <th scope="row">02</th>
-                            <td>Kedarkantha Trek</td>
-                            <td>Uttrakhand</td>
-                            <td>Hard</td>
-                            <td></td>
-                            <td>Approved</td>
-                            <td>
-                                <div class="d-inline-flex gap-2">
-                                    <a href="#" class="btn btn-sm btn-outline-primary" title="Edit"><i class="bi bi-pencil-square"></i></a>
-                                    <button class="btn btn-sm btn-outline-danger btn-delete" title="Delete"><i class="bi bi-trash"></i></button>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <th scope="row">03</th>
-                            <td>Kedartal Trek</td>
-                            <td>Uttrakhand</td>
-                            <td>Medium</td>
-                            <td></td>
-                            <td>Approved</td>
-                            <td>
-                                <div class="d-inline-flex gap-2">
-                                    <a href="#" class="btn btn-sm btn-outline-primary" title="Edit"><i class="bi bi-pencil-square"></i></a>
-                                    <button class="btn btn-sm btn-outline-danger btn-delete" title="Delete"><i class="bi bi-trash"></i></button>
-                                </div>
-                            </td>
-                        </tr>
+                        {% endfor %}
                     </tbody>
                 </table>
             </div>    

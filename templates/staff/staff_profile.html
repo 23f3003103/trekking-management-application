@@ -39,37 +39,42 @@
         <ul class="nav-bar flex-column">
 
             <li class="nav-item">
-                <a href="/templates/staff/staff_dashboard.html" class="nav-link">
+                <a href="{{ url_for('auth.staff', staff_id=staff_profile.id) }}" class="nav-link">
                     <i class="bi bi-grid-fill"></i>
                     Dashboard
                 </a>
             </li>
 
             <li class="nav-item">
-                <a href="/templates/staff/staff_manage_trek.html" class="nav-link">
+                <a class="nav-link d-flex align-items-center" data-bs-toggle="collapse" href="#myTreksList" role="button" aria-expanded="false" aria-controls="myTreksList">
                     <i class="bi bi-map"></i>
-                    My Treks
+                    <span class="ms-2">My Treks</span>
                 </a>
+                <div class="collapse" id="myTreksList">
+                    <ul class="nav flex-column ms-3">
+                        {% if my_assigned_trek is defined and my_assigned_trek|length > 0 %}
+                            {% for trek in my_assigned_trek %}
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{{ url_for('auth.staff_manage_trek', staff_id=staff_profile.id, trek_id=trek.id) }}">{{ trek.trekname }}</a>
+                                </li>
+                            {% endfor %}
+                        {% else %}
+                            <li class="nav-item"><span class="nav-link text-muted">No assigned treks</span></li>
+                        {% endif %}
+                    </ul>
+                </div>
             </li>
 
             <li class="nav-item">
-                <a href="/templates/staff/staff_profile.html" class="nav-link active">
+                <a href="{{ url_for('auth.staff_profile', staff_id=staff_profile.id) }}" class="nav-link active">
                     <i class="bi bi-calendar-check"></i>
                     Profile
                 </a>
             </li>
-
-            <!-- <li class="nav-item">
-                <a href="#" class="nav-link">
-                    <i class="bi bi-gear"></i>
-                    Settings
-                </a>
-            </li> -->
-
         </ul>
 
         <div class="logout">
-            <a href="#" class="nav-link">
+            <a href="/" class="nav-link">
                 <i class="bi bi-box-arrow-right"></i>
                 Logout
             </a>
@@ -115,10 +120,12 @@
                     <div class="col-12 col-lg-9 col-xl-8">
                         <div class="card-bar p-4 bg-white mb-4">
                             <div class="d-flex align-items-center gap-4 mb-4 pb-4 border-bottom">
-                                <div class="avatar-placeholder">AM</div>
                                 <div>
-                                    <h4 class="fw-bold mb-1 text-dark">Ankush Maurya</h4>
-                                    <p class="text-muted mb-0">Senior Trek Guide & Expedition Leader</p>
+                                    <img src="/static/images/humanicon.png" alt="Admin" class="rounded-circle border border-primary-light" style="width: 36px; height: 36px; object-fit: cover;">
+                                </div>
+                                <div>
+                                    <h4 class="fw-bold mb-1 text-dark">{{ staff_profile.user.fullname }}</h4>
+                                    <p class="text-muted mb-0">{{ staff_profile.about }}</p>
                                 </div>
                             </div>
                             <h5 class="fw-bold mb-4 text-dark" style="font-size: 1.1rem;">Personal Information</h5>
@@ -127,40 +134,40 @@
                                 <div class="col-md-5">
                                     <div class="row mb-3 align-items-baseline">
                                         <div class="col-sm-5 info-label">Full Name</div>
-                                        <div class="col-sm-7 info-value">Ankush Maurya</div>
+                                        <div class="col-sm-7 info-value">{{ staff_profile.user.fullname }}</div>
                                     </div>
                                     
                                     <div class="row mb-3 align-items-baseline">
                                         <div class="col-sm-5 info-label">Email</div>
-                                        <div class="col-sm-7 info-value text-break">ankush@gmail.com</div>
+                                        <div class="col-sm-7 info-value text-break">{{ staff_profile.user.email }}</div>
                                     </div>
                                     
                                     <div class="row mb-3 align-items-baseline">
                                         <div class="col-sm-5 info-label">Phone</div>
-                                        <div class="col-sm-7 info-value">+91 84174958623</div>
+                                        <div class="col-sm-7 info-value">{{ staff_profile.phone }}</div>
                                     </div>
                                 </div>
                                 <div class="col-md-2 d-none d-md-block"></div>
                                 <div class="col-md-5">
                                     <div class="row mb-3 align-items-baseline">
                                         <div class="col-sm-5 info-label">Location</div>
-                                        <div class="col-sm-7 info-value">Uttar Pradesh</div>
+                                        <div class="col-sm-7 info-value">{{ staff_profile.location }}</div>
                                     </div>
                                     
                                     <div class="row mb-3 align-items-baseline">
                                         <div class="col-sm-5 info-label">Experience</div>
-                                        <div class="col-sm-7 info-value">2+ Years</div>
+                                        <div class="col-sm-7 info-value">{{ staff_profile.experience }}</div>
                                     </div>
                                     
                                     <div class="row mb-3 align-items-baseline">
                                         <div class="col-sm-5 info-label">Joined Date</div>
-                                        <div class="col-sm-7 info-value">12 Jan 2024</div>
+                                        <div class="col-sm-7 info-value">{{ staff_profile.user.joined_date|date }}</div>
                                     </div>
                                 </div>
                             </div>
                             <div class="d-flex justify-content-end gap-2 mt-4 pt-3 border-top">
                                 <button type="button" class="btn btn-outline-secondary px-4">Cancel</button>
-                                <a href="/templates/staff/staff_edit_profile.html"><button type="button" class="btn btn-primary px-4">Edit Profile</button></a>
+                                <a href="{{ url_for('auth.staff_edit_profile' ,staff_id=staff_profile.id) }}"><button type="button" class="btn btn-primary px-4">Edit Profile</button></a>
                             </div>
 
                         </div>
