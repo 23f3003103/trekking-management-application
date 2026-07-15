@@ -67,18 +67,10 @@
                     Bookings
                 </a>
             </li>
-
-            <!-- <li class="nav-item">
-                <a href="#" class="nav-link">
-                    <i class="bi bi-gear"></i>
-                    Settings
-                </a>
-            </li> -->
-
         </ul>
 
         <div class="logout">
-            <a href="#" class="nav-link">
+            <a href="/" class="nav-link">
                 <i class="bi bi-box-arrow-right"></i>
                 Logout
             </a>
@@ -92,26 +84,25 @@
                 <h1 class="h4 mb-0 fw-bold d-none d-sm-block">TrekManager</h1>
             </div>
             <div class="d-flex align-items-center gap-3">
-               <a href="#">
+               <a href="{{ url_for('auth.admin') }}">
                     <button type="button" class="btn btn-outline-primary">Back</button>
                 </a> 
                 <!-- Search Bar -->
-                <div class="input-group d-none d-md-flex" style="width: 260px;">
-                    <span class="input-group-text bg-white border-end-0 text-muted"><i class="bi bi-search"></i></span>
-                    <input type="text" class="form-control border-start-0" placeholder="Search bookings, treks...">
-                </div>
+                <form method="GET" action="{{ url_for('auth.admin_manage_trekker') }}">
+                    <div class="input-group d-none d-md-flex" style="width: 260px;">
+                        <span class="input-group-text bg-white border-end-0 text-muted"><i class="bi bi-search"></i></span>
+                        <input type="text" class="form-control border-start-0" name="search" placeholder="Search trekker name....." value="{{ request.args.get('search','') }}">
+                        <button class="btn btn-primary" type="submit">
+                            Search
+                        </button>
+                    </div>
+                </form>
                 <!-- Profile Dropdown -->
                 <div class="dropdown">
                     <a href="#" class="d-flex align-items-center gap-2 text-decoration-none text-dark" data-bs-toggle="dropdown">
                         <img src="/static/images/humanicon.png" alt="Admin" class="rounded-circle border border-primary-light" style="width: 36px; height: 36px; object-fit: cover;">
                         <i class="bi bi-chevron-down d-none d-sm-block text-muted small"></i>
                     </a>
-                    <ul class="dropdown-menu dropdown-menu-end shadow border-0">
-                        <li><a class="dropdown-item" href="#"><i class="bi bi-person me-2"></i>Profile</a></li>
-                        <li><a class="dropdown-item" href="#"><i class="bi bi-gear me-2"></i>Settings</a></li>
-                        <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item text-danger" href="index.html"><i class="bi bi-box-arrow-left me-2"></i>Logout</a></li>
-                    </ul>
                 </div>
             </div>
         </header>
@@ -135,7 +126,7 @@
                         <th scope="col">User ID</th>
                         <th scope="col">User Name</th>
                         <th scope="col">Email</th>
-                        <th scope="col">Trek Name</th>
+                        <th scope="col">Phone</th>
                         <th scope="col">Actions</th>
                         </tr>
                     </thead>
@@ -145,12 +136,11 @@
                             <th scope="row">{{ trekker.id }}</th>
                             <td>{{ trekker.user.fullname }}</td>
                             <td>{{ trekker.user.email }}</td>
-                            <td>{% for booking in trekker.bookings %}
-                                    {{ booking.trek.trekname }}<br>
-                                {% endfor %}
+                            <td>{{ trekker.phone }}</td>
                             <td>
-                                <a href="{{ url_for('auth.admin_manage_trekker' , id=trekker.id) }}" class="btn btn-outline-danger">
-                                    Blacklist</a>
+                                <a href="{{ url_for('auth.admin_blacklist_trekker' , id=trekker.id) }}" class="btn btn-outline-danger">
+                                    Blacklist
+                                </a>
                             </td>
                         </tr>
                         {% endfor %}

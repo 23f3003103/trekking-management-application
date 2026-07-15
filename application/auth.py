@@ -1,5 +1,6 @@
 from flask import Blueprint, redirect, render_template, request, url_for, flash
 from application.models import *
+from sqlalchemy import or_
 from datetime import datetime
 
 auth_bp = Blueprint('auth', __name__)
@@ -92,7 +93,7 @@ def admin():
                            total_trekker=total_trekker)
 
 
-@auth_bp.route('/admin_approve_booking/<int:id>')
+@auth_bp.route('/approve_booking/<int:id>')
 def approve_booking(id):
     booking = Booking.query.get(id)
     if booking:
@@ -100,7 +101,7 @@ def approve_booking(id):
         db.session.commit()
     return redirect(url_for('auth.admin'))  
 
-@auth_bp.route('/admin_reject_booking/<int:id>')
+@auth_bp.route('/reject_booking/<int:id>')
 def reject_booking(id):
     booking = Booking.query.get(id)
     if booking:
@@ -111,8 +112,26 @@ def reject_booking(id):
 @auth_bp.route('/admin_trek', endpoint='admin_trek')
 def trek():
     this_user = User.query.filter_by(role='admin').first()
-    bookings = Booking.query.order_by(Booking.booking_date.desc()).all()
-    return render_template('templates/admin/admin_manage_trek.html', this_user=this_user, bookings=bookings)
+    query = Trek.query.order_by(Trek.start_date.desc())
+    search = request.args.get("search", "")
+    difficulty = request.args.get("difficulty", "")
+    status = request.args.get("status", "")
+    if search:
+        query = query.filter(
+            Trek.name.ilike(f"%{search}%")
+        )
+
+    if difficulty:
+        query = query.filter(
+            Trek.difficulty == difficulty
+        )
+
+    if status:
+        query = query.filter(
+            Trek.status == status
+        )
+    treks = query.all()
+    return render_template('templates/admin/admin_manage_trek.html', this_user=this_user, treks=treks)
 
 
 @auth_bp.route('/admin_add_trek', methods=['GET', 'POST'], endpoint='admin_add_trek')
@@ -165,12 +184,34 @@ def add_trek():
 # Admin Staff Manage
 @auth_bp.route('/admin_manage_staff')
 def admin_manage_staff():
-    pending_staffs = Staff.query.join(User).filter(User.status == 'pending', User.role == 'staff').all()
-    active_staffs = Staff.query.join(User).filter(User.status == 'approved', User.role == 'staff').all()
-    blacklisted_staffs = Staff.query.join(User).filter(User.status == 'blacklist', User.role == 'staff').all()
-    return render_template('templates/admin/admin_manage_staff.html', pending_staffs=pending_staffs,
-        active_staffs=active_staffs,
-        blacklisted_staffs=blacklisted_staffs)
+    search = request.args.get('search', '').strip()
+    pending_staffs = Staff.query.join(User).filter(User.status == 'pending', User.role == 'staff')
+    active_staffs = Staff.query.join(User).filter(User.status == 'approved', User.role == 'staff')
+    blacklisted_staffs = Staff.query.join(User).filter(User.status == 'blacklist', User.role == 'staff')
+    if search:
+        pending_staffs = pending_staffs.filter(
+            or_(
+                User.fullname.ilike(f"%{search}%"),
+                User.email.ilike(f"%{search}%")
+            )
+        )
+
+        active_staffs = active_staffs.filter(
+            or_(
+                User.fullname.ilike(f"%{search}%"),
+                User.email.ilike(f"%{search}%")
+            )
+        )
+
+        blacklisted_staffs = blacklisted_staffs.filter(
+            or_(
+                User.fullname.ilike(f"%{search}%"),
+                User.email.ilike(f"%{search}%")
+            )
+        )
+    return render_template('templates/admin/admin_manage_staff.html', pending_staffs=pending_staffs.all(),
+        active_staffs=active_staffs.all(),
+        blacklisted_staffs=blacklisted_staffs.all())
 
 
 @auth_bp.route('/approve_staff/<int:id>')
@@ -201,8 +242,16 @@ def restore_staff(id):
 
 @auth_bp.route('/admin_manage_trekker', endpoint='admin_manage_trekker')
 def admin_manage_trekker():
-    trekkers = Trekker.query.join(User).filter(User.role == 'trekker').all()
-    return render_template('templates/admin/admin_manage_users.html', trekkers=trekkers)
+    search = request.args.get('search', '').strip()
+    trekkers = Trekker.query.join(User).filter(User.role == 'trekker', User.status == 'approved')
+    if search:
+        trekkers = trekkers.filter(
+            or_(
+                User.fullname.ilike(f"%{search}%"),
+                User.email.ilike(f"%{search}%")
+            )
+        )
+    return render_template('templates/admin/admin_manage_users.html', trekkers=trekkers.all())
 
 
 @auth_bp.route('/admin_blacklist_trekker/<int:id>')
@@ -239,7 +288,7 @@ def staff(staff_id):
         return redirect(url_for('auth.login'))
     my_assigned_trek = Trek.query.filter_by(staff_id=staff_profile.id).all()
     total_assigned_trek = len(my_assigned_trek)
-    open_treks = Trek.query.filter_by(staff_id=staff_profile.id, status="Open").count()
+    open_treks = Trek.query.filter_by(staff_id=staff_profile.id, status="open").count()
     total_bookings = sum(len(trek.bookings) for trek in staff_profile.assigned_trek)
     total_trekkers = len({booking.user_id for trek in staff_profile.assigned_trek for booking in trek.bookings})
     return render_template('templates/staff/staff_dashboard.html', staff_profile=staff_profile,
@@ -298,12 +347,28 @@ def staff_edit_profile(staff_id):
 def trekker(trekker_id):
     trekker_profile = Trekker.query.get(trekker_id)
     if not trekker_profile:
-        trekker_profile = Trekker.query.filter_by(user_id=trekker_id).first()
-    if not trekker_profile:
         return redirect(url_for('auth.login'))
 
-    treks = Trek.query.filter(Trek.status.in_(['Open', 'Upcoming', 'Approved'])).all()
-    my_bookings = Booking.query.filter_by(user_id=trekker_id).all()
+    query = Trek.query.filter(Trek.status.in_(['Open', 'Upcoming', 'Approved']))
+    search = request.args.get("search", "")
+    difficulty = request.args.get("difficulty", "")
+    status = request.args.get("status", "")
+    if search:
+        query = query.filter(
+            Trek.name.ilike(f"%{search}%")
+        )
+
+    if difficulty:
+        query = query.filter(
+            Trek.difficulty == difficulty
+        )
+
+    if status:
+        query = query.filter(
+            Trek.status == status
+        )
+    treks = query.all()
+    my_bookings = Booking.query.filter_by(user_id=trekker_profile.user_id).all()
     return render_template('templates/user/user_dashboard.html', trekker_profile=trekker_profile, treks=treks, my_bookings=my_bookings)
 
 
@@ -311,40 +376,73 @@ def trekker(trekker_id):
 def view_trek(trekker_id, trek_id):
     trekker_profile = Trekker.query.get(trekker_id)
     trek = Trek.query.get(trek_id)
-    return render_template('templates/user/user_trek.html', trekker_profile=trekker_profile, book_trek=book_trek)
+    if not trekker_profile or not trek:
+        return redirect(url_for('auth.login'))
+
+    return render_template('templates/user/user_trek.html', trekker_profile=trekker_profile, trek=trek)
+
 
 @auth_bp.route('/trekker/<int:trekker_id>/book_trek/<int:trek_id>')
 def book_trek(trekker_id, trek_id):
-    book_trek = Trek.query.get(trek_id)
-    if book_trek:
-        book_trek.status = 'booked'
-        db.session.commit()
-        return redirect(url_for('auth.trekker', id=trekker_id))
-
-@auth_bp.route('/trekker_profile/<int:trekker_id>')
-def trekker_profile(trekker_id):
-    trekker= Trekker.query.get(trekker_id)
-    return render_template('templates/user/user_profile.html', trekker=trekker)
-
-@auth_bp.route('/trekker_edit_profile/<int:trekker_id>', methods=['GET','POST'])
-def trekker_edit_profile(trekker_id):
-    trekker= Trekker.query.get(trekker_id)
-    if not trekker:
+    trekker_profile = Trekker.query.get(trekker_id)
+    trek = Trek.query.get(trek_id)
+    if not trekker_profile or not trek:
         return redirect(url_for('auth.login'))
-    if request.method == 'POST':
-        trekker.user.fullname = request.form.get('fullname')
-        trekker.phone = request.form.get('phone')
-        trekker.location = request.form.get('loc')
-        trekker.about = request.form.get('about')
-        trekker.trekking_experience = request.form.get('texp')
-        db.session.commit()
-        return redirect(url_for('auth.trekker_profile', id=trekker_id))
-    return render_template('templates/user/user_edit_profile.html', trekker=trekker)
 
-@auth_bp.route('/trekker_history/<int:trekker_id>')
+    existing_booking = Booking.query.filter_by(user_id=trekker_profile.user_id, trek_id=trek_id).first()
+    if not existing_booking and trek.slots > 0:
+        booking = Booking(user_id=trekker_profile.user_id, trek_id=trek_id, status='Booked')
+        trek.slots = max(0, trek.slots - 1)
+        db.session.add(booking)
+        db.session.commit()
+
+    return redirect(url_for('auth.trekker', trekker_id=trekker_profile.id))
+
+
+@auth_bp.route('/trekker/<int:trekker_id>/bookings')
+def trekker_bookings(trekker_id):
+    trekker_profile = Trekker.query.get(trekker_id)
+    if not trekker_profile:
+        return redirect(url_for('auth.login'))
+
+    my_bookings = Booking.query.filter_by(user_id=trekker_profile.user_id).all()
+    return render_template('templates/user/user_booking.html', trekker_profile=trekker_profile, my_bookings=my_bookings)
+
+
+@auth_bp.route('/trekker/<int:trekker_id>/profile')
+def trekker_profile(trekker_id):
+    trekker_profile = Trekker.query.get(trekker_id)
+    if not trekker_profile:
+        return redirect(url_for('auth.login'))
+    return render_template('templates/user/user_profile.html', trekker_profile=trekker_profile)
+
+
+@auth_bp.route('/trekker/<int:trekker_id>/profile/edit', methods=['GET','POST'])
+def trekker_edit_profile(trekker_id):
+    trekker_profile = Trekker.query.get(trekker_id)
+    if not trekker_profile:
+        return redirect(url_for('auth.login'))
+
+    if request.method == 'POST':
+        trekker_profile.user.fullname = request.form.get('fullname')
+        trekker_profile.phone = request.form.get('phone')
+        trekker_profile.location = request.form.get('loc')
+        trekker_profile.about = request.form.get('about')
+        trekker_profile.trekking_experience = request.form.get('texp')
+        db.session.commit()
+        return redirect(url_for('auth.trekker_profile', trekker_id=trekker_profile.id))
+
+    return render_template('templates/user/user_edit_profile.html', trekker_profile=trekker_profile)
+
+
+@auth_bp.route('/trekker/<int:trekker_id>/history')
 def trekker_history(trekker_id):
-    mybooking = Booking.query.filter(user_id=trekker_id, status ='Completed').all()
-    return render_template('templates/user/user_history.html', mybooking=mybooking)
+    trekker_profile = Trekker.query.get(trekker_id)
+    if not trekker_profile:
+        return redirect(url_for('auth.login'))
+
+    mybooking = Booking.query.filter_by(user_id=trekker_profile.user_id, status='Completed').all()
+    return render_template('templates/user/user_history.html', trekker_profile=trekker_profile, mybooking=mybooking)
 
 def format_date(value):
     if value:

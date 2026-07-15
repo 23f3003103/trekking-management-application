@@ -67,14 +67,6 @@
                     Bookings
                 </a>
             </li>
-
-            <!-- <li class="nav-item">
-                <a href="#" class="nav-link">
-                    <i class="bi bi-gear"></i>
-                    Settings
-                </a>
-            </li> -->
-
         </ul>
 
         <div class="logout">
@@ -101,12 +93,6 @@
                         <img src="/static/images/humanicon.png" alt="Admin" class="rounded-circle border border-primary-light" style="width: 36px; height: 36px; object-fit: cover;">
                         <i class="bi bi-chevron-down d-none d-sm-block text-muted small"></i>
                     </a>
-                    <ul class="dropdown-menu dropdown-menu-end shadow border-0">
-                        <li><a class="dropdown-item" href="#"><i class="bi bi-person me-2"></i>Profile</a></li>
-                        <li><a class="dropdown-item" href="#"><i class="bi bi-gear me-2"></i>Settings</a></li>
-                        <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item text-danger" href="/"><i class="bi bi-box-arrow-left me-2"></i>Logout</a></li>
-                    </ul>
                 </div>
             </div>
         </header>
@@ -126,51 +112,53 @@
             <!-- Search Bar -->
             <div class="container mt-4">
                 <div class="row g-3">
-
+                    <form method="GET" action="{{ url_for('auth.admin_trek') }}">
                     <!-- Search -->
-                    <div class="col-md-5">
-                        <div class="input-group">
-                            <span class="input-group-text bg-white">
-                                <i class="bi bi-search"></i>
-                            </span>
-                            <input type="text"
-                                class="form-control"
-                                placeholder="Search treks by name">
+                        <div class="col-md-5">
+                            <div class="input-group">
+                                <span class="input-group-text bg-white">
+                                    <i class="bi bi-search"></i>
+                                </span>
+                                <input type="text"
+                                    class="form-control"
+                                    name="search"
+                                    placeholder="Search treks by name"
+                                    value="{{ request.args.get('search', '') }}">
+                            </div>
                         </div>
-                    </div>
 
-                    <!-- Difficulty -->
-                    <div class="col-md-3">
-                        <select class="form-select">
-                            <option selected>Difficulty</option>
-                            <option>Easy</option>
-                            <option>Moderate</option>
-                            <option>Hard</option>
-                        </select>
-                    </div>
+                        <!-- Difficulty -->
+                        <div class="col-md-3">
+                            <select class="form-select" name="difficulty">
+                                <option value="">All Difficulty</option>
+                                <option value="Easy">Easy</option>
+                                <option value="Moderate">Moderate</option>
+                                <option value="Hard">Hard</option>
+                            </select>
+                        </div>
 
-                    <!-- Status -->
-                    <div class="col-md-3">
-                        <select class="form-select">
-                            <option selected>Status</option>
-                            <option>Open</option>
-                            <option>Closed</option>
-                            <option>Upcoming</option>
-                        </select>
-                    </div>
+                        <!-- Status -->
+                        <div class="col-md-3">
+                            <select class="form-select" name="status">
+                                <option value="">All Status</option>
+                                <option value="Open">Open</option>
+                                <option value="Closed">Closed</option>
+                                <option value="Upcoming">Upcoming</option>
+                            </select>
+                        </div>
 
-                    <!-- Search Button -->
-                    <div class="col-md-1">
-                        <button class="btn btn-primary w-100">
-                            Search
-                        </button>
-                    </div>
-
+                        <!-- Search Button -->
+                        <div class="col-md-1">
+                            <button class="btn btn-primary w-100">
+                                Search
+                            </button>
+                        </div>
+                    </form>
                 </div>
             </div>
             <!-- Trek Details -->
             <div class="main-table">
-                <h3 style="margin: 10px;">Recent Bookings</h3>
+                <h3 style="margin: 10px;">Recent Treks</h3>
                 <table class="table text-center table-hover">
                     <thead class="table-light">
                         <tr>
@@ -184,14 +172,14 @@
                         </tr>
                     </thead>
                     <tbody>
-                        {% for booking in bookings %}
+                        {% for trek in treks %}
                         <tr>
-                            <th scope="row">{{ booking.id}}</th>
-                            <td>{{ booking.trek.name }}</td>
-                            <td>{{ booking.trek.location }}</td>
-                            <td>{{ booking.trek.difficulty }}</td>
-                            <td>{{ booking.trek.slot }}</td>
-                            <td>{{ booking.status }}</td>
+                            <th scope="row">{{ trek.id}}</th>
+                            <td>{{ trek.trekname }}</td>
+                            <td>{{ trek.location }}</td>
+                            <td>{{ trek.difficulty }}</td>
+                            <td>{{ trek.slots }}</td>
+                            <td>{{ trek.status }}</td>
                             <td>
                                 <div class="d-inline-flex gap-2">
                                     <a href="#" class="btn btn-sm btn-outline-primary" title="Edit"><i class="bi bi-pencil-square"></i></a>

@@ -47,51 +47,44 @@
         <ul class="nav-bar flex-column">
 
             <li class="nav-item">
-                <a href="/templates/user/user_dashboard.html" class="nav-link">
+                <a href="{{ url_for('auth.trekker', trekker_id=trekker_profile.id) }}" class="nav-link">
                     <i class="bi bi-grid-fill"></i>
                     Dashboard
                 </a>
             </li>
 
             <li class="nav-item">
-                <a href="/templates/user/user_trek.html" class="nav-link">
+                <a href="{{ url_for('auth.trekker', trekker_id=trekker_profile.id) }}" class="nav-link">
                     <i class="bi bi-map"></i>
                     Browse Treks
                 </a>
             </li>
 
             <li class="nav-item">
-                <a href="/templates/user/user_booking.html" class="nav-link active">
+                <a href="{{ url_for('auth.trekker_bookings', trekker_id=trekker_profile.id) }}" class="nav-link active">
                     <i class="bi bi-map"></i>
                     My Bookings
                 </a>
             </li>
 
             <li class="nav-item">
-                <a href="/templates/user/user_history.html" class="nav-link">
+                <a href="{{ url_for('auth.trekker_history', trekker_id=trekker_profile.id) }}" class="nav-link">
                     <i class="bi bi-map"></i>
                     History
                 </a>
             </li>
 
             <li class="nav-item">
-                <a href="/templates/user/user_profile.html" class="nav-link">
+                <a href="{{ url_for('auth.trekker_profile', trekker_id=trekker_profile.id) }}" class="nav-link">
                     <i class="bi bi-calendar-check"></i>
                     Profile
                 </a>
             </li>
 
-            <!-- <li class="nav-item">
-                <a href="#" class="nav-link">
-                    <i class="bi bi-gear"></i>
-                    Settings
-                </a>
-            </li> -->
-
         </ul>
 
         <div class="logout">
-            <a href="#" class="nav-link">
+            <a href="/" class="nav-link">
                 <i class="bi bi-box-arrow-right"></i>
                 Logout
             </a>
@@ -105,7 +98,7 @@
                 <h1 class="h4 mb-0 fw-bold d-none d-sm-block">TrekManager</h1>
             </div>
             <div class="d-flex align-items-center gap-3">
-                <a href="#">
+                <a href="{{ url_for('auth.trekker', trekker_id=trekker_profile.id) }}">
                     <button type="button" class="btn btn-outline-primary">Back</button>
                 </a> 
                 <!-- Profile Dropdown -->
@@ -114,12 +107,7 @@
                         <img src="/static/images/humanicon.png" alt="Admin" class="rounded-circle border border-primary-light" style="width: 36px; height: 36px; object-fit: cover;">
                         <i class="bi bi-chevron-down d-none d-sm-block text-muted small"></i>
                     </a>
-                    <ul class="dropdown-menu dropdown-menu-end shadow border-0">
-                        <li><a class="dropdown-item" href="#"><i class="bi bi-person me-2"></i>Profile</a></li>
-                        <li><a class="dropdown-item" href="#"><i class="bi bi-gear me-2"></i>Settings</a></li>
-                        <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item text-danger" href="index.html"><i class="bi bi-box-arrow-left me-2"></i>Logout</a></li>
-                    </ul>
+                    
                 </div>
             </div>
         </header>
@@ -146,36 +134,24 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <th scope="row">Vally of Flowers</th>
-                        <td>Uttrakhand</td>
-                        <td>Moderate</td>
-                        <td>5 Days</td>
-                        <td>
-                            <a href="/templates/user/user_trek.html" class="btn btn-outline-success">
-                                View Details</a>
-                        </td>
-                    </tr>
-                    <tr>
-                        <th scope="row">Kedartal</th>
-                        <td>Uttrakhand</td>
-                        <td>Easy</td>
-                        <td>6 Days</td>
-                        <td>
-                            <a href="/templates/user/user_trek.html" class="btn btn-outline-success">
-                                View Details</a>
-                        </td>
-                    </tr>
-                    <tr>
-                        <th scope="row">Kedarkantha</th>
-                        <td>Uttrakhand</td>
-                        <td>Hard</td>
-                        <td>7 days</td>
-                        <td>
-                            <a href="/templates/user/user_trek.html" class="btn btn-outline-success">
-                                View Details</a>
-                        </td>
-                    </tr>
+                    {% if my_bookings %}
+                        {% for booking in my_bookings %}
+                            <tr>
+                                <th scope="row">{{ booking.trek.trekname }}</th>
+                                <td>{{ booking.booking_date|date }}</td>
+                                <td>{{ booking.trek.start_date|date }} - {{ booking.trek.end_date|date }}</td>
+                                <td>{{ booking.status }}</td>
+                                <td>
+                                    <a href="{{ url_for('auth.view_trek', trek_id=booking.trek.id, trekker_id=trekker_profile.id) }}" class="btn btn-outline-success">
+                                        View Details</a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="5" class="text-muted">No bookings yet.</td>
+                        </tr>
+                    {% endif %}
                 </tbody>
             </table>
             </div>

@@ -47,51 +47,43 @@
         <ul class="nav-bar flex-column">
 
             <li class="nav-item">
-                <a href="/templates/user/user_dashboard.html" class="nav-link">
+                <a href="{{ url_for('auth.trekker', trekker_id=trekker_profile.id) }}" class="nav-link">
                     <i class="bi bi-grid-fill"></i>
                     Dashboard
                 </a>
             </li>
 
             <li class="nav-item">
-                <a href="/templates/user/user_trek.html" class="nav-link active">
+                <a href="{{ url_for('auth.trekker', trekker_id=trekker_profile.id) }}" class="nav-link active">
                     <i class="bi bi-map"></i>
                     Browse Treks
                 </a>
             </li>
 
             <li class="nav-item">
-                <a href="/templates/user/user_booking.html" class="nav-link">
+                <a href="{{ url_for('auth.trekker_bookings', trekker_id=trekker_profile.id) }}" class="nav-link">
                     <i class="bi bi-map"></i>
                     My Bookings
                 </a>
             </li>
 
             <li class="nav-item">
-                <a href="/templates/user/user_history.html" class="nav-link">
+                <a href="{{ url_for('auth.trekker_history', trekker_id=trekker_profile.id) }}" class="nav-link">
                     <i class="bi bi-map"></i>
                     History
                 </a>
             </li>
 
             <li class="nav-item">
-                <a href="/templates/user/user_profile.html" class="nav-link">
+                <a href="{{ url_for('auth.trekker_profile', trekker_id=trekker_profile.id) }}" class="nav-link">
                     <i class="bi bi-calendar-check"></i>
                     Profile
                 </a>
             </li>
-
-            <!-- <li class="nav-item">
-                <a href="#" class="nav-link">
-                    <i class="bi bi-gear"></i>
-                    Settings
-                </a>
-            </li> -->
-
         </ul>
 
         <div class="logout">
-            <a href="#" class="nav-link">
+            <a href="/" class="nav-link">
                 <i class="bi bi-box-arrow-right"></i>
                 Logout
             </a>
@@ -105,7 +97,7 @@
                 <h1 class="h4 mb-0 fw-bold d-none d-sm-block">TrekManager</h1>
             </div>
             <div class="d-flex align-items-center gap-3">
-                <a href="#">
+                <a href="{{ url_for('auth.trekker', trekker_id=trekker_profile.id) }}">
                     <button type="button" class="btn btn-outline-primary">Back</button>
                 </a>
                 <!-- Profile Dropdown -->
@@ -114,12 +106,6 @@
                         <img src="/static/images/humanicon.png" alt="Admin" class="rounded-circle border border-primary-light" style="width: 36px; height: 36px; object-fit: cover;">
                         <i class="bi bi-chevron-down d-none d-sm-block text-muted small"></i>
                     </a>
-                    <ul class="dropdown-menu dropdown-menu-end shadow border-0">
-                        <li><a class="dropdown-item" href="#"><i class="bi bi-person me-2"></i>Profile</a></li>
-                        <li><a class="dropdown-item" href="#"><i class="bi bi-gear me-2"></i>Settings</a></li>
-                        <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item text-danger" href="index.html"><i class="bi bi-box-arrow-left me-2"></i>Logout</a></li>
-                    </ul>
                 </div>
             </div>
         </header>
@@ -146,27 +132,27 @@
                     <div class="col-md-7 col-lg-6 ps-md-4">
                         <div class="row mb-2">
                             <div class="col-5 fw-bold col-sm-4 info-label">Location</div>
-                            <div class="col-7 col-sm-8 info-value">Nepal</div>
+                            <div class="col-7 col-sm-8 info-value">{{ trek.location }}</div>
                         </div>
                         <div class="row mb-2">
                             <div class="col-5 fw-bold col-sm-4 info-label">Difficulty</div>
-                            <div class="col-7 col-sm-8 info-value">Hard</div>
+                            <div class="col-7 col-sm-8 info-value">{{ trek.difficulty }}</div>
                         </div>
                         <div class="row mb-2">
                             <div class="col-5 fw-bold col-sm-4 info-label">Duration</div>
-                            <div class="col-7 col-sm-8 info-value">12 Days</div>
+                            <div class="col-7 col-sm-8 info-value">{{ trek.duration }}</div>
                         </div>
                         <div class="row mb-2">
                             <div class="col-5 fw-bold col-sm-4 info-label">Start Date</div>
-                            <div class="col-7 col-sm-8 info-value">20 May 2036</div>
+                            <div class="col-7 col-sm-8 info-value">{{ trek.start_date|date }}</div>
                         </div>
                         <div class="row mb-2">
                             <div class="col-5 fw-bold col-sm-4 info-label">End Date</div>
-                            <div class="col-7 col-sm-8 info-value">31 May 2036</div>
+                            <div class="col-7 col-sm-8 info-value">{{ trek.end_date|date }}</div>
                         </div>
                         <div class="row mb-2">
                             <div class="col-5 fw-bold col-sm-4 info-label">Available Slots</div>
-                            <div class="col-7 col-sm-8 info-value">10</div>
+                            <div class="col-7 col-sm-8 info-value">{{ trek.slots }}</div>
                         </div>
                     </div>
                 </div>
@@ -175,21 +161,20 @@
                     <div class="col-12">
                         <h5 class="description-title mb-2">Description</h5>
                         <p class="description-text m-0">
-                            Journey through colorful alpine meadows bursting with wildflowers
-                            and pristine landscapes on Uttarakhand's iconic Valley of Flowers
-                            trek.
+                            {{ trek.description}}
                         </p>
                     </div>
                 </div>
 
                 <div class="row">
                     <div class="col-12 d-flex justify-content-end">
-                        <button class="btn btn-primary btn-book shadow-sm">Book Now</button>
+                        {% if existing_booking %}
+                        <button class="btn btn-primary btn-book shadow-sm" disabled>Book Now</button>
+                        {% else %}
+                        <a href="{{ url_for('auth.book_trek', trekker_id=trekker_profile.id, trek_id=trek.id) }}" class="btn btn-primary btn-book shadow-sm">Book Now</a>
+                        {% endif %}
                     </div>
                 </div>
-
-            </div>
-            </div>
         </div>    
         
     </main>
